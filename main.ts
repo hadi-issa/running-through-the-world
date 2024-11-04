@@ -1441,8 +1441,8 @@ function levelControl() {
         `,
       SpriteKind.Button
     );
-    Play.setPosition(33, 60);
-    Help.setPosition(110, 60);
+    Play.setPosition(33, 70);
+    Help.setPosition(130, 70);
     controller.moveSprite(cursor);
   }
   if (level >= 1 && level <= 4) {
