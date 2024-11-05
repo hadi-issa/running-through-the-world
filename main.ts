@@ -1,39 +1,46 @@
 enum ActionKind {
-    Walking,
-    Idle,
-    Jumping,
-    WalkingLeft,
-    JumpingLeft,
-    IdleLeft
+  Walking,
+  Idle,
+  Jumping,
+  WalkingLeft,
+  JumpingLeft,
+  IdleLeft,
 }
 namespace SpriteKind {
-    export const Cursor = SpriteKind.create()
-    export const Button = SpriteKind.create()
-    export const Bumper = SpriteKind.create()
-    export const Goal = SpriteKind.create()
-    export const Coin = SpriteKind.create()
-    export const Flier = SpriteKind.create()
+  export const Cursor = SpriteKind.create();
+  export const Button = SpriteKind.create();
+  export const Bumper = SpriteKind.create();
+  export const Goal = SpriteKind.create();
+  export const Coin = SpriteKind.create();
+  export const Flier = SpriteKind.create();
 }
-function initializeAnimations () {
-    initializeHeroAnimations()
-    initializeCoinAnimation()
+function initializeAnimations() {
+  initializeHeroAnimations();
+  initializeCoinAnimation();
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherSprite) {
-    if (sprite.vy > 0 && !(sprite.isHittingTile(CollisionDirection.Bottom)) || sprite.y < otherSprite.top) {
-        otherSprite.destroy(effects.ashes, 250)
-        otherSprite.vy = -50
-        sprite.vy = -2 * pixelsToMeters
-        info.changeScoreBy(1)
-        music.powerUp.play()
+sprites.onOverlap(
+  SpriteKind.Player,
+  SpriteKind.Bumper,
+  function (sprite, otherSprite) {
+    if (
+      (sprite.vy > 0 && !sprite.isHittingTile(CollisionDirection.Bottom)) ||
+      sprite.y < otherSprite.top
+    ) {
+      otherSprite.destroy(effects.ashes, 250);
+      otherSprite.vy = -50;
+      sprite.vy = -2 * pixelsToMeters;
+      info.changeScoreBy(1);
+      music.powerUp.play();
     } else {
-        info.changeLifeBy(-1)
-        sprite.say("Ow!", invincibilityPeriod)
-        music.powerDown.play()
+      info.changeLifeBy(-1);
+      sprite.say("Ow!", invincibilityPeriod);
+      music.powerDown.play();
     }
-    pause(invincibilityPeriod)
-})
-function giveIntroduction () {
-    game.setDialogFrame(img`
+    pause(invincibilityPeriod);
+  }
+);
+function giveIntroduction() {
+  game.setDialogFrame(img`
         . 2 2 2 2 2 2 2 2 2 2 2 2 2 . . 
         2 2 1 1 1 1 1 1 1 1 1 1 1 2 2 . 
         2 1 1 2 2 2 2 2 2 2 2 2 1 1 2 . 
@@ -50,8 +57,8 @@ function giveIntroduction () {
         2 2 1 1 1 1 1 1 1 1 1 1 1 2 2 . 
         . 2 2 2 2 2 2 2 2 2 2 2 2 2 . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    game.setDialogCursor(img`
+        `);
+  game.setDialogCursor(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -68,17 +75,17 @@ function giveIntroduction () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    showInstruction("Press space to move to next help page.")
-    showInstruction("Refresh game to leave the instructions.")
-    showInstruction("Move with the left and right buttons.")
-    showInstruction("Jump with the up or A button.")
-    showInstruction("Double jump by pressing space midair.")
-    showInstruction("Refresh game and press play to start.")
+        `);
+  showInstruction("Press space to move to next help page.");
+  showInstruction("Refresh game to leave the instructions.");
+  showInstruction("Move with the left and right buttons.");
+  showInstruction("Jump with the up or A button.");
+  showInstruction("Double jump by pressing space midair.");
+  showInstruction("Refresh game and press play to start.");
 }
-function initializeCoinAnimation () {
-    coinAnimation = animation.createAnimation(ActionKind.Walking, 200)
-    coinAnimation.addAnimationFrame(img`
+function initializeCoinAnimation() {
+  coinAnimation = animation.createAnimation(ActionKind.Walking, 200);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -95,8 +102,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -113,8 +120,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -131,8 +138,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -149,8 +156,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -167,8 +174,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -185,8 +192,8 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    coinAnimation.addAnimationFrame(img`
+        `);
+  coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -203,31 +210,31 @@ function initializeCoinAnimation () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
+        `);
 }
-function attemptJump () {
-    if (!(gameIsOn)) {
-        return
+function attemptJump() {
+  if (!gameIsOn) {
+    return;
+  }
+  // else if: either fell off a ledge, or double jumping
+  if (hero.isHittingTile(CollisionDirection.Bottom)) {
+    hero.vy = -4 * pixelsToMeters;
+  } else if (canDoubleJump) {
+    doubleJumpSpeed = -3 * pixelsToMeters;
+    // Good double jump
+    if (hero.vy >= -40) {
+      doubleJumpSpeed = -4.5 * pixelsToMeters;
+      hero.startEffect(effects.trail, 500);
+      scene.cameraShake(2, 250);
     }
-    // else if: either fell off a ledge, or double jumping
-    if (hero.isHittingTile(CollisionDirection.Bottom)) {
-        hero.vy = -4 * pixelsToMeters
-    } else if (canDoubleJump) {
-        doubleJumpSpeed = -3 * pixelsToMeters
-        // Good double jump
-        if (hero.vy >= -40) {
-            doubleJumpSpeed = -4.5 * pixelsToMeters
-            hero.startEffect(effects.trail, 500)
-            scene.cameraShake(2, 250)
-        }
-        hero.vy = doubleJumpSpeed
-        canDoubleJump = false
-    }
+    hero.vy = doubleJumpSpeed;
+    canDoubleJump = false;
+  }
 }
-function animateIdle () {
-    mainIdleLeft = animation.createAnimation(ActionKind.IdleLeft, 100)
-    animation.attachAnimation(hero, mainIdleLeft)
-    mainIdleLeft.addAnimationFrame(img`
+function animateIdle() {
+  mainIdleLeft = animation.createAnimation(ActionKind.IdleLeft, 100);
+  animation.attachAnimation(hero, mainIdleLeft);
+  mainIdleLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -244,10 +251,10 @@ function animateIdle () {
         . . . f a a b f f a a b f . . . 
         . . . f a a b f f a a b f . . . 
         . . . . f f f . . f f f . . . . 
-        `)
-    mainIdleRight = animation.createAnimation(ActionKind.Idle, 100)
-    animation.attachAnimation(hero, mainIdleRight)
-    mainIdleRight.addAnimationFrame(img`
+        `);
+  mainIdleRight = animation.createAnimation(ActionKind.Idle, 100);
+  animation.attachAnimation(hero, mainIdleRight);
+  mainIdleRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -264,15 +271,15 @@ function animateIdle () {
         . . . f b a a f f b a a f . . . 
         . . . f b a a f f b a a f . . . 
         . . . . f f f . . f f f . . . . 
-        `)
+        `);
 }
-function setLevelTileMap (level: number) {
-    clearGame()
-    if (level == 1) {
-        tiles.setTilemap(tilemap`level`)
-    } else if (level == 2) {
-        tiles.setTilemap(tilemap`level_0`)
-        scene.setBackgroundImage(img`
+function setLevelTileMap(level: number) {
+  clearGame();
+  if (level == 1) {
+    tiles.setTilemap(tilemap`level`);
+  } else if (level == 2) {
+    tiles.setTilemap(tilemap`level_0`);
+    scene.setBackgroundImage(img`
             999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
             999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
             999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -393,10 +400,10 @@ function setLevelTileMap (level: number) {
             eeeceeeecceeeeeeceeceeeeeeeeeeeeecceeeeeeececeeeeecceeeeeee7eeeecceeeeeceeeeeeceeceeeeeeceeeeeecceceeeeeeeceeeeeceeceeecc7eeeeeceeeeeceeeeeeceeeeeeeeceeeeeeecc
             eeeeeeeeeeeeeeeeeeceeeeeeeeeeeeeeeeceeeeeeeceeeeeeeecceeeeeeceeeeeeeeeeeeeeeeeecceeeeeeeeeeeeeeeeceeeeeecceeeeeeeecceeeeeeceeeeeeeeeeeeeeeeeecceeeeeeeeeeeeeeee
             eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            `)
-    } else if (level == 3) {
-        tiles.setTilemap(tilemap`level_1`)
-        scene.setBackgroundImage(img`
+            `);
+  } else if (level == 3) {
+    tiles.setTilemap(tilemap`level_1`);
+    scene.setBackgroundImage(img`
             cccccccccccccccccccccccccccccccffcccccccccccccccccccccccccccccccccccccccccfce2cfcccccccccccfccccccccccccccccccccccccccccccccccccccccccfceeecfcccccccccccccccccc
             cccfffffffffcccccfcccccccfceeeeeecffccccfccccccccccccfccccccccccccccccfcfceeeecfccccccccfcfccccccccccccccccccfcccccccccccccccccccccccfceeeeecfccccccccccccccccc
             ccfceeeeeeecfccccccccfcfceee222eeeecffcccccccccccccccccccccccccccfcfcccfceeeeeecfcccccffeeecfccccccccccccccccccccffcccccccccccccccccfceee2eeecfffcccccccccccccc
@@ -517,10 +524,10 @@ function setLevelTileMap (level: number) {
             fccccccccceefffffffffe2fffffffffffffff2ecfcccccffceee222222fffffe222e22cfcfccccccfffe2effee22effffffffe2cfccfcccccfe2efccfcccccfccfc2cfcccccccfc2fffffffffff2ec
             ccfcccfcf2efffffffffffe2fffffffffffffff2ecfcccfcce2fffffffffffffffffffeeccffcfccfcccfe2cc2fffffffffffffe2cffcffccccfe2cffccccfccfcfc2efcccffcfceeffffffffffff2e
             2cccccccf2effffffffffffe2fffffffffffffff2efcccfe22fffffffffffffffffffff2efcccccccfcccfc22fffffffffffffffe2fcccccccccfe2cccccccccccfc2efccccccfe2ffffffffffffffe
-            `)
-    } else if (level == 4) {
-        tiles.setTilemap(tilemap`level_2`)
-        scene.setBackgroundImage(img`
+            `);
+  } else if (level == 4) {
+    tiles.setTilemap(tilemap`level_2`);
+    scene.setBackgroundImage(img`
             fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -641,25 +648,29 @@ function setLevelTileMap (level: number) {
             bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbdbbbcccccccccccccccccffffffffccccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc
             bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccccccccccccccccccfccccbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
             bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccbbbbccccccccccccccccccccccccbdddcfcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-            `)
-        gravity = gravity / 2
-    }
-    initializeLevel(level)
+            `);
+    gravity = gravity / 2;
+  }
+  initializeLevel(level);
 }
-sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherSprite) {
+sprites.onOverlap(
+  SpriteKind.Cursor,
+  SpriteKind.Button,
+  function (sprite, otherSprite) {
     if (otherSprite == Play && controller.A.isPressed()) {
-        level = 1
-        levelControl()
+      level = 1;
+      levelControl();
     }
     if (otherSprite == Help && controller.A.isPressed()) {
-        level = 5
-        levelControl()
+      level = 5;
+      levelControl();
     }
-})
-function animateRun () {
-    mainRunLeft = animation.createAnimation(ActionKind.WalkingLeft, 100)
-    animation.attachAnimation(hero, mainRunLeft)
-    mainRunLeft.addAnimationFrame(img`
+  }
+);
+function animateRun() {
+  mainRunLeft = animation.createAnimation(ActionKind.WalkingLeft, 100);
+  animation.attachAnimation(hero, mainRunLeft);
+  mainRunLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f . . . . . . 
         . . f e e e e e e e f . . . . . 
@@ -676,8 +687,8 @@ function animateRun () {
         . . . f a a a a b f f . . . . . 
         . . . f a a a a b f . . . . . . 
         . . . . f f f f f . . . . . . . 
-        `)
-    mainRunLeft.addAnimationFrame(img`
+        `);
+  mainRunLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f . . . . . . 
@@ -694,8 +705,8 @@ function animateRun () {
         . . f a a a a a a a a b f f . . 
         . . . f a a b f f a a a f f . . 
         . . . . f f f . f f f f f . . . 
-        `)
-    mainRunLeft.addAnimationFrame(img`
+        `);
+  mainRunLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f . . . . . . 
         . . f e e e e e e e f . . . . . 
@@ -712,8 +723,8 @@ function animateRun () {
         . . . f a a a a b f f . . . . . 
         . . . f a a a a b f . . . . . . 
         . . . . f f f f f . . . . . . . 
-        `)
-    mainRunLeft.addAnimationFrame(img`
+        `);
+  mainRunLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f . . . . . . 
@@ -730,10 +741,10 @@ function animateRun () {
         f f f a a a a a a a b f . . . . 
         . f a a b f a a b f f . . . . . 
         . f f f f . f f f . . . . . . . 
-        `)
-    mainRunRight = animation.createAnimation(ActionKind.Walking, 100)
-    animation.attachAnimation(hero, mainRunRight)
-    mainRunRight.addAnimationFrame(img`
+        `);
+  mainRunRight = animation.createAnimation(ActionKind.Walking, 100);
+  animation.attachAnimation(hero, mainRunRight);
+  mainRunRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f f . . . 
         . . . . . f e e e e e e e f . . 
@@ -750,8 +761,8 @@ function animateRun () {
         . . . . . f f b a a a a f . . . 
         . . . . . . f b a a a a f . . . 
         . . . . . . . f f f f f . . . . 
-        `)
-    mainRunRight.addAnimationFrame(img`
+        `);
+  mainRunRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f f . . . 
@@ -768,8 +779,8 @@ function animateRun () {
         . . f f b a a a a a a a a f . . 
         . . f f a a a f f b a a f . . . 
         . . . f f f f . . f f f . . . . 
-        `)
-    mainRunRight.addAnimationFrame(img`
+        `);
+  mainRunRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f f . . . 
         . . . . . f e e e e e e e f . . 
@@ -786,8 +797,8 @@ function animateRun () {
         . . . . . f f b a a a a f . . . 
         . . . . . . f b a a a a f . . . 
         . . . . . . . f f f f f . . . . 
-        `)
-    mainRunRight.addAnimationFrame(img`
+        `);
+  mainRunRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . f f f f f f f . . . 
@@ -804,15 +815,15 @@ function animateRun () {
         . . . . f b a a a a a a a f f f 
         . . . . . f f b a a f b a a f . 
         . . . . . . . f f f . f f f . . 
-        `)
+        `);
 }
-function animateJumps () {
-    // Because there isn't currently an easy way to say "play this animation a single time
-    // and stop at the end", this just adds a bunch of the same frame at the end to accomplish
-    // the same behavior
-    mainJumpLeft = animation.createAnimation(ActionKind.JumpingLeft, 100)
-    animation.attachAnimation(hero, mainJumpLeft)
-    mainJumpLeft.addAnimationFrame(img`
+function animateJumps() {
+  // Because there isn't currently an easy way to say "play this animation a single time
+  // and stop at the end", this just adds a bunch of the same frame at the end to accomplish
+  // the same behavior
+  mainJumpLeft = animation.createAnimation(ActionKind.JumpingLeft, 100);
+  animation.attachAnimation(hero, mainJumpLeft);
+  mainJumpLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -829,8 +840,8 @@ function animateJumps () {
         . . . f a a b f f a a b f . . . 
         . . . f a a b f f a a b f . . . 
         . . . . f f f . . f f f . . . . 
-        `)
-    mainJumpLeft.addAnimationFrame(img`
+        `);
+  mainJumpLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -847,9 +858,9 @@ function animateJumps () {
         . . . f a a b f f a a b f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    for (let index = 0; index < 30; index++) {
-        mainJumpLeft.addAnimationFrame(img`
+        `);
+  for (let index = 0; index < 30; index++) {
+    mainJumpLeft.addAnimationFrame(img`
             . . . . . . . . . . . . . . . . 
             . . . f f f f f f f f f f . . . 
             . . f e e e e e e e e e e f . . 
@@ -866,11 +877,11 @@ function animateJumps () {
             . . . f a a b f f a a b f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
-            `)
-    }
-    mainJumpRight = animation.createAnimation(ActionKind.Jumping, 100)
-    animation.attachAnimation(hero, mainJumpRight)
-    mainJumpRight.addAnimationFrame(img`
+            `);
+  }
+  mainJumpRight = animation.createAnimation(ActionKind.Jumping, 100);
+  animation.attachAnimation(hero, mainJumpRight);
+  mainJumpRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -887,8 +898,8 @@ function animateJumps () {
         . . . f b a a f f b a a f . . . 
         . . . f b a a f f b a a f . . . 
         . . . . f f f . . f f f . . . . 
-        `)
-    mainJumpRight.addAnimationFrame(img`
+        `);
+  mainJumpRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -905,9 +916,9 @@ function animateJumps () {
         . . . f b a a f f b a a f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
-        `)
-    for (let index = 0; index < 30; index++) {
-        mainJumpRight.addAnimationFrame(img`
+        `);
+  for (let index = 0; index < 30; index++) {
+    mainJumpRight.addAnimationFrame(img`
             . . . . . . . . . . . . . . . . 
             . . . f f f f f f f f f f . . . 
             . . f e e e e e e e e e e f . . 
@@ -924,13 +935,13 @@ function animateJumps () {
             . . . f b a a f f b a a f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
-            `)
-    }
+            `);
+  }
 }
-function animateCrouch () {
-    mainCrouchLeft = animation.createAnimation(ActionKind.Idle, 100)
-    animation.attachAnimation(hero, mainCrouchLeft)
-    mainCrouchLeft.addAnimationFrame(img`
+function animateCrouch() {
+  mainCrouchLeft = animation.createAnimation(ActionKind.Idle, 100);
+  animation.attachAnimation(hero, mainCrouchLeft);
+  mainCrouchLeft.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -947,10 +958,10 @@ function animateCrouch () {
         f d d f f f b b f f f f d d f . 
         . f f a a a a a a a a a b f . . 
         . . . f f f f . f f f f f . . . 
-        `)
-    mainCrouchRight = animation.createAnimation(ActionKind.Idle, 100)
-    animation.attachAnimation(hero, mainCrouchRight)
-    mainCrouchRight.addAnimationFrame(img`
+        `);
+  mainCrouchRight = animation.createAnimation(ActionKind.Idle, 100);
+  animation.attachAnimation(hero, mainCrouchRight);
+  mainCrouchRight.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
@@ -967,21 +978,22 @@ function animateCrouch () {
         . f d d f f f f b b f f f d d f 
         . . f b a a a a a a a a a f f . 
         . . . f f f f f . f f f f . . . 
-        `)
+        `);
 }
-function clearGame () {
-    for (let value of sprites.allOfKind(SpriteKind.Bumper)) {
-        value.destroy()
-    }
-    for (let value2 of sprites.allOfKind(SpriteKind.Coin)) {
-        value2.destroy()
-    }
-    for (let value3 of sprites.allOfKind(SpriteKind.Goal)) {
-        value3.destroy()
-    }
+function clearGame() {
+  for (let value of sprites.allOfKind(SpriteKind.Bumper)) {
+    value.destroy();
+  }
+  for (let value2 of sprites.allOfKind(SpriteKind.Coin)) {
+    value2.destroy();
+  }
+  for (let value3 of sprites.allOfKind(SpriteKind.Goal)) {
+    value3.destroy();
+  }
 }
-function beginGame () {
-    hero = sprites.create(img`
+function beginGame() {
+  hero = sprites.create(
+    img`
         . . . . . . . . . . . . . . . . 
         . . . f f f f f f f f f f . . . 
         . . f e e e e e e e e e e f . . 
@@ -998,13 +1010,15 @@ function beginGame () {
         . . . f b a a f f b a a f . . . 
         . . . f b a a f f b a a f . . . 
         . . . . f f f . . f f f . . . . 
-        `, SpriteKind.Player)
-    // how long to pause between each contact with a
-    // single enemy
-    invincibilityPeriod = 600
-    pixelsToMeters = 30
-    gravity = 9.81 * pixelsToMeters
-    scene.setBackgroundImage(img`
+        `,
+    SpriteKind.Player
+  );
+  // how long to pause between each contact with a
+  // single enemy
+  invincibilityPeriod = 600;
+  pixelsToMeters = 30;
+  gravity = 9.81 * pixelsToMeters;
+  scene.setBackgroundImage(img`
         9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
         9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
         9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -1125,18 +1139,17 @@ function beginGame () {
         9899999998999999989999999899999998999999989999999899999998999999989999999899999998999999989999999899999998999999989999999899999998999999999999999999999999999999
         8989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989898989
         9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
-        `)
-    initializeAnimations()
-    createPlayer(hero)
-    currentLevel = 1
-    setLevelTileMap(1)
+        `);
+  initializeAnimations();
+  createPlayer(hero);
+  currentLevel = 1;
+  setLevelTileMap(1);
 }
-function levelControl () {
-    if (level == 0) {
-        gameIsOn = false
-        // set menu
-        scene.setBackgroundImage(img`
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+function levelControl() {
+  if (level == 0) {
+    gameIsOn = false;
+    // set menu
+    scene.setBackgroundImage(img`ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1229,6 +1242,26 @@ function levelControl () {
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5ccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5ccccccccccccccccccc5ccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5c5555ccc55cccccccc5555c5c5ccc55cccccccc555ccc555ccc555cc55ccc5ccc55555cccccccc5555c55cccccccc55c5cc55ccc5cc5cc55ccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5c5ccccc5cc5cccccccc5ccc55c5c5cc5cccccccccc5cc5ccccc5ccc5cc5cc5c5c55cccccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5cc5cccccccccccccccccccccccc
+            cccccccccccccccccc5cc5cc55ccc5555cccccccc5ccc5cc5c5555cccccccc555cc5ccccc5ccc5cc5cc5c5c5c55cccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5555cccccccccccccccccccccccc
+            cccccccccccccccccc5cc5cccc5cc5ccccccccccc5ccc5cc5c5cccccccccc5cc5cc5ccccc5ccc5cc5ccc5c5cccc5ccccccccc5cc5cc5ccccccc5c5c55cc5cccc5cc5ccccccccccccccccccccccccccc
+            ccccccccccccccccccc55cc555cccc555ccccccccc55c5cc5cc555cccccccc555cc5ccccc5cccc55cccc5c5c555ccccccccccc55c55cccccccc5c5c5c55ccccc5ccc555cccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc55cccccccccccccccccccccc
+            cccccc5ccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccc5c5ccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccc5ccccccccccccccc5cccccc
+            ccccc5555c5c5ccc55ccccccccc555c5cc5ccc555c5555ccc55ccc555cccccccc55cccccccc5555c555cc555cccc555cc55ccccccccc5555c55cccccccc5555ccc55cccc5ccc55cccc555cc5555cccc
+            cccccc5ccc55c5c5cc5ccccccc5cccc5cc5ccc5ccc5ccccc5cc5cc5cccccccccc55c5cccccc5cccc5cc5cccc5cc5cccc5cc5ccccccccc5cc5cc5ccccccc5ccccc5cc5ccc5cc5cc5cc5cccccc5cccccc
+            cccccc5ccc5cc5c5555ccccccc5cccc5cc5ccc5cccc55ccc5cc5cc5ccccccccc5cc5cccccccc55cc5cc5cc555cc5cccc5555ccccccccc5cc5cc5cccccccc55ccc5555ccc5cc5555cc5cccccc5cccccc
+            cccccc5ccc5cc5c5cccccccccc5cccc5cc5ccc5cccccc5cc5cc5cc5ccccccccc5cc5cccccccccc5c5cc5c5cc5cc5cccc5cccccccccccc5cc5cc5cccccccccc5cc5cccccc5cc5ccccc5cccccc5cccccc
+            ccccccc55c5cc5cc555cccccccc555cc555ccc5ccc555cccc55ccc5cccccccccc55c5cccccc555cc555ccc555ccc555cc555cccccccccc55c55cccccccc555cccc555ccc55cc555ccc555cccc55cccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -1236,28 +1269,9 @@ function levelControl () {
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccc5cc5cccccccccccccccccccccccccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccc5cc5cccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccc5cc5cccccccccccccccccccccccccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccc5cc5cccccccccccccccccccccccccccccccccccccccccccc
-            cccc5cc5cc555ccc55cccc555c555cccc55cccccc555cc55c55cc55cc5cc5cc5c555cccc555cc55ccccc555555ccc55cc5ccc5cc55cccc555c555ccc55ccccccc55cc5cc5c55cc555ccc55cc55ccccc
-            cccc5cc5c5ccccc5cc5cccc5cc5cc5cc5cc5ccccccc5cc5cc5cc5cc5c5c5c5c55cccccccc5cc5cc5cccc5cc5cc5c5cc5cc5c5cc5cc5cccc5cc5cc5c5cc5ccccc5cc5c5cc5c5cc5ccccc5cc5c5cccccc
-            cccc5cc5cc55ccc5555cccc5cc5cc5cc5555ccccc555cc5cc5cc5cc5c5c5c5c5c55cccccc5cc5cc5cccc5cc5cc5c5cc5cc5c5cc5555cccc5cc5cc5c5555ccccc5cccc5cc5c5ccc55ccc5cc5c5cccccc
-            cccc5cc5cccc5cc5ccccccc5cc5cc5cc5ccccccc5cc5cc5cc5cc5cc5c5c5c5c5ccc5ccccc5cc5cc5cccc5cc5cc5c5cc5cc5c5cc5ccccccc5cc5cc5c5cccccccc5cc5c5cc5c5ccccc5cc5cc5c5cccccc
-            ccccc555c555cccc555cccc55c5cc5ccc555cccc5555cc5cc5ccc55ccc5ccc5c555cccccc55cc55ccccc5cc5cc5cc55cccc5cccc555cccc55c5cc5cc555cccccc55ccc555c5cc555cccc55cc5cccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            `)
-        cursor = sprites.create(img`
+            `);
+    cursor = sprites.create(
+      img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -1274,8 +1288,11 @@ function levelControl () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
-            `, SpriteKind.Cursor)
-        Play = sprites.create(img`
+            `,
+      SpriteKind.Cursor
+    );
+    Play = sprites.create(
+      img`
             ...............................................................
             ...............................................................
             ...............................................................
@@ -1340,8 +1357,11 @@ function levelControl () {
             ...............................................................
             ...............................................................
             ...............................................................
-            `, SpriteKind.Button)
-        Help = sprites.create(img`
+            `,
+      SpriteKind.Button
+    );
+    Help = sprites.create(
+      img`
             ...............................................................
             ...............................................................
             ...............................................................
@@ -1406,99 +1426,110 @@ function levelControl () {
             ...............................................................
             ...............................................................
             ...............................................................
-            `, SpriteKind.Button)
-        Play.setPosition(33, 70)
-        Help.setPosition(130, 70)
-        controller.moveSprite(cursor)
-    }
-    if (level >= 1 && level <= 4) {
-        gameIsOn = true
-        sprites.destroy(Play)
-        sprites.destroy(Help)
-        sprites.destroy(cursor)
-        beginGame()
-    }
-    if (level == 5) {
-        gameIsOn = false
-        giveIntroduction()
-    }
+            `,
+      SpriteKind.Button
+    );
+    Play.setPosition(33, 70);
+    Help.setPosition(130, 70);
+    controller.moveSprite(cursor);
+  }
+  if (level >= 1 && level <= 4) {
+    gameIsOn = true;
+    sprites.destroy(Play);
+    sprites.destroy(Help);
+    sprites.destroy(cursor);
+    beginGame();
+  }
+  if (level == 5) {
+    gameIsOn = false;
+    giveIntroduction();
+  }
 }
-scene.onOverlapTile(SpriteKind.Player, assets.tile`Checkpoint`, function (sprite4, location) {
-    info.changeLifeBy(1)
-    currentLevel += 1
+scene.onOverlapTile(
+  SpriteKind.Player,
+  assets.tile`Checkpoint`,
+  function (sprite4, location) {
+    info.changeLifeBy(1);
+    currentLevel += 1;
     if (hasNextLevel()) {
-        game.splash("Next level unlocked!")
-        setLevelTileMap(currentLevel)
+      game.splash("Next level unlocked!");
+      setLevelTileMap(currentLevel);
     } else {
-        game.over(true, effects.confetti)
+      game.over(true, effects.confetti);
     }
-})
-function createEnemies () {
-    // enemy that moves back and forth
-    for (let value5 of tiles.getTilesByType(assets.tile`Slime`)) {
-        bumper = sprites.create(assets.image`Slime0`, SpriteKind.Bumper)
-        tiles.placeOnTile(bumper, value5)
-        tiles.setTileAt(value5, assets.tile`tile0`)
-        bumper.ay = gravity
-        if (Math.percentChance(50)) {
-            bumper.vx = Math.randomRange(30, 60)
-        } else {
-            bumper.vx = Math.randomRange(-60, -30)
-        }
+  }
+);
+function createEnemies() {
+  // enemy that moves back and forth
+  for (let value5 of tiles.getTilesByType(assets.tile`Slime`)) {
+    bumper = sprites.create(assets.image`Slime0`, SpriteKind.Bumper);
+    tiles.placeOnTile(bumper, value5);
+    tiles.setTileAt(value5, assets.tile`tile0`);
+    bumper.ay = gravity;
+    if (Math.percentChance(50)) {
+      bumper.vx = Math.randomRange(30, 60);
+    } else {
+      bumper.vx = Math.randomRange(-60, -30);
     }
+  }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
-})
+  attemptJump();
+});
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
-})
-function showInstruction (text: string) {
-    game.showLongText(text, DialogLayout.Bottom)
-    music.baDing.play()
+  attemptJump();
+});
+function showInstruction(text: string) {
+  game.showLongText(text, DialogLayout.Bottom);
+  music.baDing.play();
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite2, otherSprite2) {
-    otherSprite2.destroy(effects.trail, 250)
-    otherSprite2.y += -3
-    info.changeScoreBy(3)
-    music.baDing.play()
-})
-function initializeHeroAnimations () {
-    animateRun()
-    animateIdle()
-    animateCrouch()
-    animateJumps()
+sprites.onOverlap(
+  SpriteKind.Player,
+  SpriteKind.Coin,
+  function (sprite2, otherSprite2) {
+    otherSprite2.destroy(effects.trail, 250);
+    otherSprite2.y += -3;
+    info.changeScoreBy(3);
+    music.baDing.play();
+  }
+);
+function initializeHeroAnimations() {
+  animateRun();
+  animateIdle();
+  animateCrouch();
+  animateJumps();
 }
-function createPlayer (player2: Sprite) {
-    player2.ay = gravity
-    scene.cameraFollowSprite(player2)
-    controller.moveSprite(player2, 100, 0)
-    player2.z = 5
-    info.setLife(3)
-    info.setScore(0)
+function createPlayer(player2: Sprite) {
+  player2.ay = gravity;
+  scene.cameraFollowSprite(player2);
+  controller.moveSprite(player2, 100, 0);
+  player2.z = 5;
+  info.setLife(3);
+  info.setScore(0);
 }
-function initializeLevel (level2: number) {
-    effects.clouds.startScreenEffect()
-    playerStartLocation = tiles.getTilesByType(assets.tile`tile6`)[0]
-    tiles.placeOnTile(hero, playerStartLocation)
-    tiles.setTileAt(playerStartLocation, assets.tile`tile0`)
-    createEnemies()
-    spawnGoals()
+function initializeLevel(level2: number) {
+  effects.clouds.startScreenEffect();
+  playerStartLocation = tiles.getTilesByType(assets.tile`tile6`)[0];
+  tiles.placeOnTile(hero, playerStartLocation);
+  tiles.setTileAt(playerStartLocation, assets.tile`tile0`);
+  createEnemies();
+  spawnGoals();
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (level == 0) {
-        return;
-    }
-    if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
-        hero.vy += 80
-    }
-})
-function hasNextLevel () {
-    return currentLevel != levelCount
+  if (level == 0) {
+    return;
+  }
+  if (!hero.isHittingTile(CollisionDirection.Bottom)) {
+    hero.vy += 80;
+  }
+});
+function hasNextLevel() {
+  return currentLevel != levelCount;
 }
-function spawnGoals () {
-    for (let value7 of tiles.getTilesByType(assets.tile`tile5`)) {
-        coin = sprites.create(img`
+function spawnGoals() {
+  for (let value7 of tiles.getTilesByType(assets.tile`tile5`)) {
+    coin = sprites.create(
+      img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -1515,102 +1546,109 @@ function spawnGoals () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
-            `, SpriteKind.Coin)
-        tiles.placeOnTile(coin, value7)
-        animation.attachAnimation(coin, coinAnimation)
-        animation.setAction(coin, ActionKind.Idle)
-        tiles.setTileAt(value7, assets.tile`tile0`)
-    }
+            `,
+      SpriteKind.Coin
+    );
+    tiles.placeOnTile(coin, value7);
+    animation.attachAnimation(coin, coinAnimation);
+    animation.setAction(coin, ActionKind.Idle);
+    tiles.setTileAt(value7, assets.tile`tile0`);
+  }
 }
-let heroFacingLeft = false
-let coin: Sprite = null
-let playerStartLocation: tiles.Location = null
-let bumper: Sprite = null
-let cursor: Sprite = null
-let currentLevel = 0
-let mainCrouchRight: animation.Animation = null
-let mainCrouchLeft: animation.Animation = null
-let mainJumpRight: animation.Animation = null
-let mainJumpLeft: animation.Animation = null
-let mainRunRight: animation.Animation = null
-let mainRunLeft: animation.Animation = null
-let Help: Sprite = null
-let Play: Sprite = null
-let gravity = 0
-let mainIdleRight: animation.Animation = null
-let mainIdleLeft: animation.Animation = null
-let doubleJumpSpeed = 0
-let canDoubleJump = false
-let hero: Sprite = null
-let gameIsOn = false
-let coinAnimation: animation.Animation = null
-let invincibilityPeriod = 0
-let pixelsToMeters = 0
-let levelCount = 0
-let level = 0
-level = 0
-levelCount = 6
-levelControl()
+let heroFacingLeft = false;
+let coin: Sprite = null;
+let playerStartLocation: tiles.Location = null;
+let bumper: Sprite = null;
+let cursor: Sprite = null;
+let currentLevel = 0;
+let mainCrouchRight: animation.Animation = null;
+let mainCrouchLeft: animation.Animation = null;
+let mainJumpRight: animation.Animation = null;
+let mainJumpLeft: animation.Animation = null;
+let mainRunRight: animation.Animation = null;
+let mainRunLeft: animation.Animation = null;
+let Help: Sprite = null;
+let Play: Sprite = null;
+let gravity = 0;
+let mainIdleRight: animation.Animation = null;
+let mainIdleLeft: animation.Animation = null;
+let doubleJumpSpeed = 0;
+let canDoubleJump = false;
+let hero: Sprite = null;
+let gameIsOn = false;
+let coinAnimation: animation.Animation = null;
+let invincibilityPeriod = 0;
+let pixelsToMeters = 0;
+let levelCount = 0;
+let level = 0;
+level = 0;
+levelCount = 6;
+levelControl();
 forever(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
-})
+  if (!gameIsOn) {
+    return;
+  }
+  music.play(
+    music.createSong(
+      hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`
+    ),
+    music.PlaybackMode.UntilDone
+  );
+});
 // Reset double jump when standing on wall
 game.onUpdate(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    if (hero.isHittingTile(CollisionDirection.Bottom)) {
-        canDoubleJump = true
-    }
-})
+  if (!gameIsOn) {
+    return;
+  }
+  if (hero.isHittingTile(CollisionDirection.Bottom)) {
+    canDoubleJump = true;
+  }
+});
 // bumper movement
 game.onUpdate(function () {
-    if (!(gameIsOn)) {
-        return;
+  if (!gameIsOn) {
+    return;
+  }
+  for (let value9 of sprites.allOfKind(SpriteKind.Bumper)) {
+    if (value9.isHittingTile(CollisionDirection.Left)) {
+      value9.vx = Math.randomRange(30, 60);
+    } else if (value9.isHittingTile(CollisionDirection.Right)) {
+      value9.vx = Math.randomRange(-60, -30);
     }
-    for (let value9 of sprites.allOfKind(SpriteKind.Bumper)) {
-        if (value9.isHittingTile(CollisionDirection.Left)) {
-            value9.vx = Math.randomRange(30, 60)
-        } else if (value9.isHittingTile(CollisionDirection.Right)) {
-            value9.vx = Math.randomRange(-60, -30)
-        }
-    }
-})
+  }
+});
 // set up hero animations
 game.onUpdate(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    if (hero.vx < 0) {
-        heroFacingLeft = true
-    } else if (hero.vx > 0) {
-        heroFacingLeft = false
-    }
-    if (hero.isHittingTile(CollisionDirection.Top)) {
-        hero.vy = 0
-    }
-    if (controller.down.isPressed()) {
-        if (heroFacingLeft) {
-            animation.setAction(hero, ActionKind.IdleLeft)
-        } else {
-            animation.setAction(hero, ActionKind.Idle)
-        }
-    } else if (hero.vy < 20 && !(hero.isHittingTile(CollisionDirection.Bottom))) {
-        if (heroFacingLeft) {
-            animation.setAction(hero, ActionKind.IdleLeft)
-        } else {
-            animation.setAction(hero, ActionKind.Idle)
-        }
-    } else if (hero.vx < 0) {
-        animation.setAction(hero, ActionKind.WalkingLeft)
-    } else if (hero.vx > 0) {
-        animation.setAction(hero, ActionKind.Walking)
-    } else if (heroFacingLeft) {
-        animation.setAction(hero, ActionKind.IdleLeft)
+  if (!gameIsOn) {
+    return;
+  }
+  if (hero.vx < 0) {
+    heroFacingLeft = true;
+  } else if (hero.vx > 0) {
+    heroFacingLeft = false;
+  }
+  if (hero.isHittingTile(CollisionDirection.Top)) {
+    hero.vy = 0;
+  }
+  if (controller.down.isPressed()) {
+    if (heroFacingLeft) {
+      animation.setAction(hero, ActionKind.IdleLeft);
     } else {
-        animation.setAction(hero, ActionKind.Idle)
+      animation.setAction(hero, ActionKind.Idle);
     }
-})
+  } else if (hero.vy < 20 && !hero.isHittingTile(CollisionDirection.Bottom)) {
+    if (heroFacingLeft) {
+      animation.setAction(hero, ActionKind.IdleLeft);
+    } else {
+      animation.setAction(hero, ActionKind.Idle);
+    }
+  } else if (hero.vx < 0) {
+    animation.setAction(hero, ActionKind.WalkingLeft);
+  } else if (hero.vx > 0) {
+    animation.setAction(hero, ActionKind.Walking);
+  } else if (heroFacingLeft) {
+    animation.setAction(hero, ActionKind.IdleLeft);
+  } else {
+    animation.setAction(hero, ActionKind.Idle);
+  }
+});
