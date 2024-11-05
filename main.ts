@@ -14,6 +14,10 @@ namespace SpriteKind {
     export const Coin = SpriteKind.create()
     export const Flier = SpriteKind.create()
 }
+function initializeAnimations () {
+    initializeHeroAnimations()
+    initializeCoinAnimation()
+}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherSprite) {
     if (sprite.vy > 0 && !(sprite.isHittingTile(CollisionDirection.Bottom)) || sprite.y < otherSprite.top) {
         otherSprite.destroy(effects.ashes, 250)
@@ -28,10 +32,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherS
     }
     pause(invincibilityPeriod)
 })
-function initializeAnimations () {
-    initializeHeroAnimations()
-    initializeCoinAnimation()
-}
 function giveIntroduction () {
     game.setDialogFrame(img`
         . 2 2 2 2 2 2 2 2 2 2 2 2 2 . . 
@@ -69,14 +69,13 @@ function giveIntroduction () {
         . . . . . . . . . . . . . . . . 
         . . . . . . . . . . . . . . . . 
         `)
+    showInstruction("Press space to move to next help page.")
+    showInstruction("Refresh game to leave the instructions.")
     showInstruction("Move with the left and right buttons.")
     showInstruction("Jump with the up or A button.")
-    showInstruction("Double jump by pressing jump again.")
-    showInstruction("Refresh game to escape loop")
+    showInstruction("Double jump by pressing space midair.")
+    showInstruction("Refresh game and press play to start.")
 }
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
-})
 function initializeCoinAnimation () {
     coinAnimation = animation.createAnimation(ActionKind.Walking, 200)
     coinAnimation.addAnimationFrame(img`
@@ -647,8 +646,15 @@ function setLevelTileMap (level: number) {
     }
     initializeLevel(level)
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
+sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherSprite) {
+    if (otherSprite == Play && controller.A.isPressed()) {
+        level = 1
+        levelControl()
+    }
+    if (otherSprite == Help && controller.A.isPressed()) {
+        level = 5
+        levelControl()
+    }
 })
 function animateRun () {
     mainRunLeft = animation.createAnimation(ActionKind.WalkingLeft, 100)
@@ -800,16 +806,6 @@ function animateRun () {
         . . . . . . . f f f . f f f . . 
         `)
 }
-scene.onOverlapTile(SpriteKind.Player, assets.tile`Checkpoint`, function (sprite4, location) {
-    info.changeLifeBy(1)
-    currentLevel += 1
-    if (hasNextLevel()) {
-        game.splash("Next level unlocked!")
-        setLevelTileMap(currentLevel)
-    } else {
-        game.over(true, effects.confetti)
-    }
-})
 function animateJumps () {
     // Because there isn't currently an easy way to say "play this animation a single time
     // and stop at the end", this just adds a bunch of the same frame at the end to accomplish
@@ -931,16 +927,6 @@ function animateJumps () {
             `)
     }
 }
-sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherSprite) {
-    if (otherSprite == Play && controller.A.isPressed()) {
-        level = 1
-        levelControl()
-    }
-    if (otherSprite == Help && controller.A.isPressed()) {
-        level = 5
-        levelControl()
-    }
-})
 function animateCrouch () {
     mainCrouchLeft = animation.createAnimation(ActionKind.Idle, 100)
     animation.attachAnimation(hero, mainCrouchLeft)
@@ -1437,11 +1423,15 @@ function levelControl () {
         giveIntroduction()
     }
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite2, otherSprite2) {
-    otherSprite2.destroy(effects.trail, 250)
-    otherSprite2.y += -3
-    info.changeScoreBy(3)
-    music.baDing.play()
+scene.onOverlapTile(SpriteKind.Player, assets.tile`Checkpoint`, function (sprite4, location) {
+    info.changeLifeBy(1)
+    currentLevel += 1
+    if (hasNextLevel()) {
+        game.splash("Next level unlocked!")
+        setLevelTileMap(currentLevel)
+    } else {
+        game.over(true, effects.confetti)
+    }
 })
 function createEnemies () {
     // enemy that moves back and forth
@@ -1457,18 +1447,22 @@ function createEnemies () {
         }
     }
 }
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (level == 0) {
-        return;
-    }
-    if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
-        hero.vy += 80
-    }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    attemptJump()
+})
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    attemptJump()
 })
 function showInstruction (text: string) {
     game.showLongText(text, DialogLayout.Bottom)
     music.baDing.play()
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite2, otherSprite2) {
+    otherSprite2.destroy(effects.trail, 250)
+    otherSprite2.y += -3
+    info.changeScoreBy(3)
+    music.baDing.play()
+})
 function initializeHeroAnimations () {
     animateRun()
     animateIdle()
@@ -1491,6 +1485,14 @@ function initializeLevel (level2: number) {
     createEnemies()
     spawnGoals()
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (level == 0) {
+        return;
+    }
+    if (!(hero.isHittingTile(CollisionDirection.Bottom))) {
+        hero.vy += 80
+    }
+})
 function hasNextLevel () {
     return currentLevel != levelCount
 }
@@ -1525,15 +1527,15 @@ let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
 let bumper: Sprite = null
 let cursor: Sprite = null
+let currentLevel = 0
 let mainCrouchRight: animation.Animation = null
 let mainCrouchLeft: animation.Animation = null
-let Help: Sprite = null
-let Play: Sprite = null
 let mainJumpRight: animation.Animation = null
 let mainJumpLeft: animation.Animation = null
-let currentLevel = 0
 let mainRunRight: animation.Animation = null
 let mainRunLeft: animation.Animation = null
+let Help: Sprite = null
+let Play: Sprite = null
 let gravity = 0
 let mainIdleRight: animation.Animation = null
 let mainIdleLeft: animation.Animation = null
@@ -1549,6 +1551,12 @@ let level = 0
 level = 0
 levelCount = 6
 levelControl()
+forever(function () {
+    if (!(gameIsOn)) {
+        return;
+    }
+    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
+})
 // Reset double jump when standing on wall
 game.onUpdate(function () {
     if (!(gameIsOn)) {
@@ -1605,10 +1613,4 @@ game.onUpdate(function () {
     } else {
         animation.setAction(hero, ActionKind.Idle)
     }
-})
-forever(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
 })
