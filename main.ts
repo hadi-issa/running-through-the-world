@@ -14,10 +14,6 @@ namespace SpriteKind {
     export const Coin = SpriteKind.create()
     export const Flier = SpriteKind.create()
 }
-function initializeAnimations() {
-    initializeHeroAnimations()
-    initializeCoinAnimation()
-}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherSprite) {
     if (sprite.vy > 0 && !(sprite.isHittingTile(CollisionDirection.Bottom)) || sprite.y < otherSprite.top) {
         otherSprite.destroy(effects.ashes, 250)
@@ -32,8 +28,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Bumper, function (sprite, otherS
     }
     pause(invincibilityPeriod)
 })
-function giveIntroduction() {
-    helpOn=true
+function initializeAnimations () {
+    initializeHeroAnimations()
+    initializeCoinAnimation()
+}
+function giveIntroduction () {
+    helpOn = true
     game.setDialogFrame(img`
         . 2 2 2 2 2 2 2 2 2 2 2 2 2 . . 
         2 2 1 1 1 1 1 1 1 1 1 1 1 2 2 . 
@@ -76,9 +76,12 @@ function giveIntroduction() {
     showInstruction("Jump with the up or A button.")
     showInstruction("Double jump by pressing space midair.")
     showInstruction("Press A to start the game.")
-    helpOn=false
+    helpOn = false
 }
-function initializeCoinAnimation() {
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    attemptJump()
+})
+function initializeCoinAnimation () {
     coinAnimation = animation.createAnimation(ActionKind.Walking, 200)
     coinAnimation.addAnimationFrame(img`
         . . . . . . . . . . . . . . . . 
@@ -207,7 +210,7 @@ function initializeCoinAnimation() {
         . . . . . . . . . . . . . . . . 
         `)
 }
-function attemptJump() {
+function attemptJump () {
     if (!(gameIsOn)) {
         return
     }
@@ -226,7 +229,12 @@ function attemptJump() {
         canDoubleJump = false
     }
 }
-function animateIdle() {
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(gameIsOn)) {
+        giveIntroduction()
+    }
+})
+function animateIdle () {
     mainIdleLeft = animation.createAnimation(ActionKind.IdleLeft, 100)
     animation.attachAnimation(hero, mainIdleLeft)
     mainIdleLeft.addAnimationFrame(img`
@@ -239,12 +247,12 @@ function animateIdle() {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainIdleRight = animation.createAnimation(ActionKind.Idle, 100)
@@ -259,16 +267,16 @@ function animateIdle() {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         `)
 }
-function setLevelTileMap(level: number) {
+function setLevelTileMap (level: number) {
     clearGame()
     if (level == 1) {
         tiles.setTilemap(tilemap`level`)
@@ -648,19 +656,21 @@ function setLevelTileMap(level: number) {
     }
     initializeLevel(level)
 }
-sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherSprite) {
-    if (otherSprite == Play && controller.A.isPressed()) {
-        level = 1
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (helpIsOverlap) {
+        level = 5
         levelControl()
     }
-    
-    if (otherSprite == Help){
-        helpIsOverlap=true
-    }else{
-        helpIsOverlap = false
+    if (helpOn) {
+        return;
+    }
+    if (gameIsOn) {
+        attemptJump()
+    } else {
+        beginGame()
     }
 })
-function animateRun() {
+function animateRun () {
     mainRunLeft = animation.createAnimation(ActionKind.WalkingLeft, 100)
     animation.attachAnimation(hero, mainRunLeft)
     mainRunLeft.addAnimationFrame(img`
@@ -673,12 +683,12 @@ function animateRun() {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c a a c c b f . . . . 
+        . . f c c c 7 7 c c b f . . . . 
         . . f c c d d d c c b f . . . . 
         . . f b f f d d f f f f . . . . 
-        . . f a a a a a a a b f . . . . 
-        . . . f a a a a b f f . . . . . 
-        . . . f a a a a b f . . . . . . 
+        . . f 7 7 7 7 7 7 7 b f . . . . 
+        . . . f 7 7 7 7 b f f . . . . . 
+        . . . f 7 7 7 7 b f . . . . . . 
         . . . . f f f f f . . . . . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -692,11 +702,11 @@ function animateRun() {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c c a a c b f . . . . 
+        . . f c c c c 7 7 c b f . . . . 
         . . f c c c c d d c b f . . . . 
         . . f b f f d d d f f f f . . . 
-        . . f a a a a a a a a b f f . . 
-        . . . f a a b f f a a a f f . . 
+        . . f 7 7 7 7 7 7 7 7 b f f . . 
+        . . . f 7 7 b f f 7 7 7 f f . . 
         . . . . f f f . f f f f f . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -709,12 +719,12 @@ function animateRun() {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c a a c c b f . . . . 
+        . . f c c c 7 7 c c b f . . . . 
         . . f c c d d d c c b f . . . . 
         . . f b f f d d f f f f . . . . 
-        . . f a a a a a a a b f . . . . 
-        . . . f a a a a b f f . . . . . 
-        . . . f a a a a b f . . . . . . 
+        . . f 7 7 7 7 7 7 7 b f . . . . 
+        . . . f 7 7 7 7 b f f . . . . . 
+        . . . f 7 7 7 7 b f . . . . . . 
         . . . . f f f f f . . . . . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -728,11 +738,11 @@ function animateRun() {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c a a c c c c b f . . . . 
+        . . f c 7 7 c c c c b f . . . . 
         . f d d d b c c c c b f . . . . 
         f f f d d f f f f f f f . . . . 
-        f f f a a a a a a a b f . . . . 
-        . f a a b f a a b f f . . . . . 
+        f f f 7 7 7 7 7 7 7 b f . . . . 
+        . f 7 7 b f 7 7 b f f . . . . . 
         . f f f f . f f f . . . . . . . 
         `)
     mainRunRight = animation.createAnimation(ActionKind.Walking, 100)
@@ -747,12 +757,12 @@ function animateRun() {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c a a c c c f . . 
+        . . . . f b c c 7 7 c c c f . . 
         . . . . f b c c d d d c c f . . 
         . . . . f f f f d d f f b f . . 
-        . . . . f b a a a a a a a f . . 
-        . . . . . f f b a a a a f . . . 
-        . . . . . . f b a a a a f . . . 
+        . . . . f b 7 7 7 7 7 7 7 f . . 
+        . . . . . f f b 7 7 7 7 f . . . 
+        . . . . . . f b 7 7 7 7 f . . . 
         . . . . . . . f f f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -766,11 +776,11 @@ function animateRun() {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c a a c c c c f . . 
+        . . . . f b c 7 7 c c c c f . . 
         . . . . f b c d d c c c c f . . 
         . . . f f f f d d d f f b f . . 
-        . . f f b a a a a a a a a f . . 
-        . . f f a a a f f b a a f . . . 
+        . . f f b 7 7 7 7 7 7 7 7 f . . 
+        . . f f 7 7 7 f f b 7 7 f . . . 
         . . . f f f f . . f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -783,12 +793,12 @@ function animateRun() {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c a a c c c f . . 
+        . . . . f b c c 7 7 c c c f . . 
         . . . . f b c c d d d c c f . . 
         . . . . f f f f d d f f b f . . 
-        . . . . f b a a a a a a a f . . 
-        . . . . . f f b a a a a f . . . 
-        . . . . . . f b a a a a f . . . 
+        . . . . f b 7 7 7 7 7 7 7 f . . 
+        . . . . . f f b 7 7 7 7 f . . . 
+        . . . . . . f b 7 7 7 7 f . . . 
         . . . . . . . f f f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -802,15 +812,25 @@ function animateRun() {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c c c a a c f . . 
+        . . . . f b c c c c 7 7 c f . . 
         . . . . f b c c c c b d d d f . 
         . . . . f f f f f f f d d f f f 
-        . . . . f b a a a a a a a f f f 
-        . . . . . f f b a a f b a a f . 
+        . . . . f b 7 7 7 7 7 7 7 f f f 
+        . . . . . f f b 7 7 f b 7 7 f . 
         . . . . . . . f f f . f f f . . 
         `)
 }
-function animateJumps() {
+scene.onOverlapTile(SpriteKind.Player, assets.tile`Checkpoint`, function (sprite4, location) {
+    info.changeLifeBy(1)
+    currentLevel += 1
+    if (hasNextLevel()) {
+        game.splash("Next level unlocked!")
+        setLevelTileMap(currentLevel)
+    } else {
+        game.over(true, effects.confetti)
+    }
+})
+function animateJumps () {
     // Because there isn't currently an easy way to say "play this animation a single time
     // and stop at the end", this just adds a bunch of the same frame at the end to accomplish
     // the same behavior
@@ -826,12 +846,12 @@ function animateJumps() {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainJumpLeft.addAnimationFrame(img`
@@ -844,11 +864,11 @@ function animateJumps() {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
         `)
@@ -863,11 +883,11 @@ function animateJumps() {
             . f d d f d d d d f d d d e f . 
             . f d d f d d d d f d d d f . . 
             . f d d d d d d d d d d d f f . 
-            . d a b c c c c c c c c b a d . 
-            . d a c c c c c c c c c c a d . 
+            . d 7 b c c c c c c c c b 7 d . 
+            . d 7 c c c c c c c c c c 7 d . 
             . f f f f f b b f f f f f f f . 
-            . . f a a a a a a a a a b f . . 
-            . . . f a a b f f a a b f . . . 
+            . . f 7 7 7 7 7 7 7 7 7 b f . . 
+            . . . f 7 7 b f f 7 7 b f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
             `)
@@ -884,12 +904,12 @@ function animateJumps() {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainJumpRight.addAnimationFrame(img`
@@ -902,11 +922,11 @@ function animateJumps() {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
         `)
@@ -921,17 +941,28 @@ function animateJumps() {
             . f e d d d f d d d d f d d f . 
             . . f d d d f d d d d f d d f . 
             . f f d d d d d d d d d d d f . 
-            . d a b c c c c c c c c b a d . 
-            . d a c c c c c c c c c c a d . 
+            . d 7 b c c c c c c c c b 7 d . 
+            . d 7 c c c c c c c c c c 7 d . 
             . f f f f f f f b b f f f f f . 
-            . . f b a a a a a a a a a f . . 
-            . . . f b a a f f b a a f . . . 
+            . . f b 7 7 7 7 7 7 7 7 7 f . . 
+            . . . f b 7 7 f f b 7 7 f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
             `)
     }
 }
-function animateCrouch() {
+sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherSprite) {
+    if (otherSprite == Play && controller.A.isPressed()) {
+        level = 1
+        levelControl()
+    }
+    if (otherSprite == Help) {
+        helpIsOverlap = true
+    } else {
+        helpIsOverlap = false
+    }
+})
+function animateCrouch () {
     mainCrouchLeft = animation.createAnimation(ActionKind.Idle, 100)
     animation.attachAnimation(hero, mainCrouchLeft)
     mainCrouchLeft.addAnimationFrame(img`
@@ -946,10 +977,10 @@ function animateCrouch() {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d c c c c c c c c c d d f . 
         f d d f f f b b f f f f d d f . 
-        . f f a a a a a a a a a b f . . 
+        . f f 7 7 7 7 7 7 7 7 7 b f . . 
         . . . f f f f . f f f f f . . . 
         `)
     mainCrouchRight = animation.createAnimation(ActionKind.Idle, 100)
@@ -966,14 +997,14 @@ function animateCrouch() {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . f d d c c c c c c c c c d f . 
         . f d d f f f f b b f f f d d f 
-        . . f b a a a a a a a a a f f . 
+        . . f b 7 7 7 7 7 7 7 7 7 f f . 
         . . . f f f f f . f f f f . . . 
         `)
 }
-function clearGame() {
+function clearGame () {
     for (let value of sprites.allOfKind(SpriteKind.Bumper)) {
         value.destroy()
     }
@@ -984,7 +1015,7 @@ function clearGame() {
         value3.destroy()
     }
 }
-function beginGame() {
+function beginGame () {
     sprites.destroy(Play)
     sprites.destroy(Help)
     sprites.destroy(cursor)
@@ -1137,196 +1168,198 @@ function beginGame() {
     createPlayer(hero)
     currentLevel = 1
     setLevelTileMap(1)
-    gameIsOn=true
+    gameIsOn = true
 }
-function levelControl() {
+function levelControl () {
     if (level == 0) {
         gameIsOn = false
         // set menu
-        scene.setBackgroundImage(img`ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc5555cccc5555ccc555555555ccc555cccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc5555cccc5555ccc555555555ccc5555ccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc5555ccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc55555cc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc555555c555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5cc5c555ccc55555555cccc555555c555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc55555555cccc555c555555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc555ccccccccc555c555555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc555ccccccccc555cc55555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555ccccccccc555ccc5555ccc5555cc5555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555555555ccc555ccc5555cccc55555555cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555555555ccc555cccc555ccccc555555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccc5cc5ccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccc5cc5ccccccccccccccccccc5ccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccc5cc5c5555ccc55cccccccc5555c5c5ccc55cccccccc555ccc555ccc555cc55ccc5ccc55555cccccccc5555c55cccccccc55c5cc55ccc5cc5cc55ccccccccccccccccccccccccc
-cccccccccccccccccc5cc5c5ccccc5cc5cccccccc5ccc55c5c5cc5cccccccccc5cc5ccccc5ccc5cc5cc5c5c55cccccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5cc5cccccccccccccccccccccccc
-cccccccccccccccccc5cc5cc55ccc5555cccccccc5ccc5cc5c5555cccccccc555cc5ccccc5ccc5cc5cc5c5c5c55cccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5555cccccccccccccccccccccccc
-cccccccccccccccccc5cc5cccc5cc5ccccccccccc5ccc5cc5c5cccccccccc5cc5cc5ccccc5ccc5cc5ccc5c5cccc5ccccccccc5cc5cc5ccccccc5c5c55cc5cccc5cc5ccccccccccccccccccccccccccc
-ccccccccccccccccccc55cc555cccc555ccccccccc55c5cc5cc555cccccccc555cc5ccccc5cccc55cccc5c5c555ccccccccccc55c55cccccccc5c5c5c55ccccc5ccc555cccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc55cccccccccccccccccccccc
-cccccc5ccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccc5c5ccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccc5ccccccccccccccc5cccccc
-ccccc5555c5c5ccc55ccccccccc555c5cc5ccc555c5555ccc55ccc555cccccccc55cccccccc5555c555cc555cccc555cc55ccccccccc5555c55cccccccc5555ccc55cccc5ccc55cccc555cc5555cccc
-cccccc5ccc55c5c5cc5ccccccc5cccc5cc5ccc5ccc5ccccc5cc5cc5cccccccccc55c5cccccc5cccc5cc5cccc5cc5cccc5cc5ccccccccc5cc5cc5ccccccc5ccccc5cc5ccc5cc5cc5cc5cccccc5cccccc
-cccccc5ccc5cc5c5555ccccccc5cccc5cc5ccc5cccc55ccc5cc5cc5ccccccccc5cc5cccccccc55cc5cc5cc555cc5cccc5555ccccccccc5cc5cc5cccccccc55ccc5555ccc5cc5555cc5cccccc5cccccc
-cccccc5ccc5cc5c5cccccccccc5cccc5cc5ccc5cccccc5cc5cc5cc5ccccccccc5cc5cccccccccc5c5cc5c5cc5cc5cccc5cccccccccccc5cc5cc5cccccccccc5cc5cccccc5cc5ccccc5cccccc5cccccc
-ccccccc55c5cc5cc555cccccccc555cc555ccc5ccc555cccc55ccc5cccccccccc55c5cccccc555cc555ccc555ccc555cc555cccccccccc55c55cccccccc555cccc555ccc55cc555ccc555cccc55cccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-`)
-       
-        Play = sprites.create(img`..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-...........................................................fffffff........
-.......77777777....777...........777.....7777...7777......fffffffff.......
-.......777777777...777...........777......777...777......fffffffffff......
-.......777...777...777..........77777.....7777.7777......fffffffffff......
-.......777...777...777..........77777......777.777......fffff111fffff.....
-.......777...777...777.........777.777......77777.......fffff111fffff.....
-.......77777777....777.........777.777......77777.......ffff11f11ffff.....
-.......7777777.....777........7777.7777......777........ffff11f11ffff.....
-.......777.........777........777...777......777........ffff11111ffff.....
-.......777.........777........777777777......777........fff1111111fff.....
-.......777.........777.......77777777777.....777........fff11fff11fff.....
-.......777.........77777777..777.....777.....777.........fffffffffff......
-.......777.........77777777.777.......777....777.........fffffffffff......
-..........................................................fffffffff.......
-...........................................................fffffff........
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-`, SpriteKind.Button)
-        Help = sprites.create(img`..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-...........................................................fffffff........
-........777....777....777777777..777........77777777......fffffffff.......
-........777....777....777777777..777........777777777....fffffffffff......
-........777....777....777........777........777...777....fffffffffff......
-........777....777....777........777........777...777...ffff1111fffff.....
-........777....777....777........777........777...777...ffff11111ffff.....
-........7777777777....77777777...777........77777777....ffff11f11ffff.....
-........7777777777....77777777...777........7777777.....ffff1111fffff.....
-........777....777....777........777........777.........ffff11f11ffff.....
-........777....777....777........777........777.........ffff11111ffff.....
-........777....777....777........777........777.........ffff1111fffff.....
-........777....777....777777777..77777777...777..........fffffffffff......
-........777....777....777777777..77777777...777..........fffffffffff......
-..........................................................fffffffff.......
-...........................................................fffffff........
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-..........................................................................
-`, SpriteKind.Button)
+        scene.setBackgroundImage(img`
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc5555cccc5555ccc555555555ccc555cccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc5555cccc5555ccc555555555ccc5555ccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc5555ccc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc55555cc555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc55555cc55555ccc555ccccccccc555555c555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5cc5c555ccc55555555cccc555555c555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc55555555cccc555c555555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc555ccccccccc555c555555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555c5555c555ccc555ccccccccc555cc55555ccc555cccc555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555ccccccccc555ccc5555ccc5555cc5555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555555555ccc555ccc5555cccc55555555cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccc555cc55cc555ccc555555555ccc555cccc555ccccc555555ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5ccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5ccccccccccccccccccc5ccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5c5555ccc55cccccccc5555c5c5ccc55cccccccc555ccc555ccc555cc55ccc5ccc55555cccccccc5555c55cccccccc55c5cc55ccc5cc5cc55ccccccccccccccccccccccccc
+            cccccccccccccccccc5cc5c5ccccc5cc5cccccccc5ccc55c5c5cc5cccccccccc5cc5ccccc5ccc5cc5cc5c5c55cccccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5cc5cccccccccccccccccccccccc
+            cccccccccccccccccc5cc5cc55ccc5555cccccccc5ccc5cc5c5555cccccccc555cc5ccccc5ccc5cc5cc5c5c5c55cccccccccc5cc5cc5ccccccc5c5c55cc5ccc5c5c5555cccccccccccccccccccccccc
+            cccccccccccccccccc5cc5cccc5cc5ccccccccccc5ccc5cc5c5cccccccccc5cc5cc5ccccc5ccc5cc5ccc5c5cccc5ccccccccc5cc5cc5ccccccc5c5c55cc5cccc5cc5ccccccccccccccccccccccccccc
+            ccccccccccccccccccc55cc555cccc555ccccccccc55c5cc5cc555cccccccc555cc5ccccc5cccc55cccc5c5c555ccccccccccc55c55cccccccc5c5c5c55ccccc5ccc555cccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccc5ccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc55cccccccccccccccccccccc
+            cccccc5ccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccc5c5ccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccc5ccccccccccccccc5cccccc
+            ccccc5555c5c5ccc55ccccccccc555c5cc5ccc555c5555ccc55ccc555cccccccc55cccccccc5555c555cc555cccc555cc55ccccccccc5555c55cccccccc5555ccc55cccc5ccc55cccc555cc5555cccc
+            cccccc5ccc55c5c5cc5ccccccc5cccc5cc5ccc5ccc5ccccc5cc5cc5cccccccccc55c5cccccc5cccc5cc5cccc5cc5cccc5cc5ccccccccc5cc5cc5ccccccc5ccccc5cc5ccc5cc5cc5cc5cccccc5cccccc
+            cccccc5ccc5cc5c5555ccccccc5cccc5cc5ccc5cccc55ccc5cc5cc5ccccccccc5cc5cccccccc55cc5cc5cc555cc5cccc5555ccccccccc5cc5cc5cccccccc55ccc5555ccc5cc5555cc5cccccc5cccccc
+            cccccc5ccc5cc5c5cccccccccc5cccc5cc5ccc5cccccc5cc5cc5cc5ccccccccc5cc5cccccccccc5c5cc5c5cc5cc5cccc5cccccccccccc5cc5cc5cccccccccc5cc5cccccc5cc5ccccc5cccccc5cccccc
+            ccccccc55c5cc5cc555cccccccc555cc555ccc5ccc555cccc55ccc5cccccccccc55c5cccccc555cc555ccc555ccc555cc555cccccccccc55c55cccccccc555cccc555ccc55cc555ccc555cccc55cccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc5cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+            `)
+        Play = sprites.create(img`
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ...........................................................fffffff........
+            .......77777777....777...........777.....7777...7777......fffffffff.......
+            .......777777777...777...........777......777...777......fffffffffff......
+            .......777...777...777..........77777.....7777.7777......fffffffffff......
+            .......777...777...777..........77777......777.777......fffff111fffff.....
+            .......777...777...777.........777.777......77777.......fffff111fffff.....
+            .......77777777....777.........777.777......77777.......ffff11f11ffff.....
+            .......7777777.....777........7777.7777......777........ffff11f11ffff.....
+            .......777.........777........777...777......777........ffff11111ffff.....
+            .......777.........777........777777777......777........fff1111111fff.....
+            .......777.........777.......77777777777.....777........fff11fff11fff.....
+            .......777.........77777777..777.....777.....777.........fffffffffff......
+            .......777.........77777777.777.......777....777.........fffffffffff......
+            ..........................................................fffffffff.......
+            ...........................................................fffffff........
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            `, SpriteKind.Button)
+        Help = sprites.create(img`
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ...........................................................fffffff........
+            ........777....777....777777777..777........77777777......fffffffff.......
+            ........777....777....777777777..777........777777777....fffffffffff......
+            ........777....777....777........777........777...777....fffffffffff......
+            ........777....777....777........777........777...777...ffff1111fffff.....
+            ........777....777....777........777........777...777...ffff11111ffff.....
+            ........7777777777....77777777...777........77777777....ffff11f11ffff.....
+            ........7777777777....77777777...777........7777777.....ffff1111fffff.....
+            ........777....777....777........777........777.........ffff11f11ffff.....
+            ........777....777....777........777........777.........ffff11111ffff.....
+            ........777....777....777........777........777.........ffff1111fffff.....
+            ........777....777....777777777..77777777...777..........fffffffffff......
+            ........777....777....777777777..77777777...777..........fffffffffff......
+            ..........................................................fffffffff.......
+            ...........................................................fffffff........
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            ..........................................................................
+            `, SpriteKind.Button)
         Play.setPosition(33, 70)
         Help.setPosition(120, 70)
         cursor = sprites.create(img`
@@ -1351,7 +1384,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     }
     if (level >= 1 && level <= 4) {
         gameIsOn = true
-     
         beginGame()
     }
     if (level == 5) {
@@ -1359,17 +1391,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         giveIntroduction()
     }
 }
-scene.onOverlapTile(SpriteKind.Player, assets.tile`Checkpoint`, function (sprite4, location) {
-    info.changeLifeBy(1)
-    currentLevel += 1
-    if (hasNextLevel()) {
-        game.splash("Next level unlocked!")
-        setLevelTileMap(currentLevel)
-    } else {
-        game.over(true, effects.confetti)
-    }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite2, otherSprite2) {
+    otherSprite2.destroy(effects.trail, 250)
+    otherSprite2.y += -3
+    info.changeScoreBy(3)
+    music.baDing.play()
 })
-function createEnemies() {
+function createEnemies () {
     // enemy that moves back and forth
     for (let value5 of tiles.getTilesByType(assets.tile`Slime`)) {
         bumper = sprites.create(assets.image`Slime0`, SpriteKind.Bumper)
@@ -1383,60 +1411,6 @@ function createEnemies() {
         }
     }
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (helpIsOverlap) {
-        level = 5
-        levelControl()
-    }
-    if (helpOn) return
-    if(gameIsOn){
-        attemptJump()
-    }else{
-        beginGame()
-    }
-   
-})
-controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!gameIsOn) {
-        giveIntroduction()
-    } 
-
-})
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump()
-})
-function showInstruction(text: string) {
-    game.showLongText(text, DialogLayout.Bottom)
-    music.baDing.play()
-}
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite2, otherSprite2) {
-    otherSprite2.destroy(effects.trail, 250)
-    otherSprite2.y += -3
-    info.changeScoreBy(3)
-    music.baDing.play()
-})
-function initializeHeroAnimations() {
-    animateRun()
-    animateIdle()
-    animateCrouch()
-    animateJumps()
-}
-function createPlayer(player2: Sprite) {
-    player2.ay = gravity
-    scene.cameraFollowSprite(player2)
-    controller.moveSprite(player2, 100, 0)
-    player2.z = 5
-    info.setLife(3)
-    info.setScore(0)
-}
-function initializeLevel(level2: number) {
-    effects.clouds.startScreenEffect()
-    playerStartLocation = tiles.getTilesByType(assets.tile`tile6`)[0]
-    tiles.placeOnTile(hero, playerStartLocation)
-    tiles.setTileAt(playerStartLocation, assets.tile`tile0`)
-    createEnemies()
-    spawnGoals()
-}
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (level == 0) {
         return;
@@ -1445,10 +1419,36 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         hero.vy += 80
     }
 })
-function hasNextLevel() {
+function showInstruction (text: string) {
+    game.showLongText(text, DialogLayout.Bottom)
+    music.baDing.play()
+}
+function initializeHeroAnimations () {
+    animateRun()
+    animateIdle()
+    animateCrouch()
+    animateJumps()
+}
+function createPlayer (player2: Sprite) {
+    player2.ay = gravity
+    scene.cameraFollowSprite(player2)
+    controller.moveSprite(player2, 100, 0)
+    player2.z = 5
+    info.setLife(3)
+    info.setScore(0)
+}
+function initializeLevel (level2: number) {
+    effects.clouds.startScreenEffect()
+    playerStartLocation = tiles.getTilesByType(assets.tile`tile6`)[0]
+    tiles.placeOnTile(hero, playerStartLocation)
+    tiles.setTileAt(playerStartLocation, assets.tile`tile0`)
+    createEnemies()
+    spawnGoals()
+}
+function hasNextLevel () {
     return currentLevel != levelCount
 }
-function spawnGoals() {
+function spawnGoals () {
     for (let value7 of tiles.getTilesByType(assets.tile`tile5`)) {
         coin = sprites.create(img`
             . . . . . . . . . . . . . . . . 
@@ -1479,25 +1479,25 @@ let coin: Sprite = null
 let playerStartLocation: tiles.Location = null
 let bumper: Sprite = null
 let cursor: Sprite = null
-let currentLevel = 0
 let mainCrouchRight: animation.Animation = null
 let mainCrouchLeft: animation.Animation = null
-let mainJumpRight: animation.Animation = null
-let mainJumpLeft: animation.Animation = null
-let mainRunRight: animation.Animation = null
-let mainRunLeft: animation.Animation = null
 let Help: Sprite = null
 let Play: Sprite = null
+let mainJumpRight: animation.Animation = null
+let mainJumpLeft: animation.Animation = null
+let currentLevel = 0
+let mainRunRight: animation.Animation = null
+let mainRunLeft: animation.Animation = null
+let helpIsOverlap = false
 let gravity = 0
 let mainIdleRight: animation.Animation = null
 let mainIdleLeft: animation.Animation = null
 let doubleJumpSpeed = 0
 let canDoubleJump = false
 let hero: Sprite = null
-let helpIsOverlap=false
 let gameIsOn = false
-let helpOn = false
 let coinAnimation: animation.Animation = null
+let helpOn = false
 let invincibilityPeriod = 0
 let pixelsToMeters = 0
 let levelCount = 0
@@ -1505,12 +1505,6 @@ let level = 0
 level = 0
 levelCount = 6
 levelControl()
-forever(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
-})
 // Reset double jump when standing on wall
 game.onUpdate(function () {
     if (!(gameIsOn)) {
@@ -1567,4 +1561,10 @@ game.onUpdate(function () {
     } else {
         animation.setAction(hero, ActionKind.Idle)
     }
+})
+forever(function () {
+    if (!(gameIsOn)) {
+        return;
+    }
+    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
 })
