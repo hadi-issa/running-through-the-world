@@ -247,12 +247,12 @@ function animateIdle () {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainIdleRight = animation.createAnimation(ActionKind.Idle, 100)
@@ -267,12 +267,12 @@ function animateIdle () {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         `)
 }
@@ -683,12 +683,12 @@ function animateRun () {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c a a c c b f . . . . 
+        . . f c c c 7 7 c c b f . . . . 
         . . f c c d d d c c b f . . . . 
         . . f b f f d d f f f f . . . . 
-        . . f a a a a a a a b f . . . . 
-        . . . f a a a a b f f . . . . . 
-        . . . f a a a a b f . . . . . . 
+        . . f 7 7 7 7 7 7 7 b f . . . . 
+        . . . f 7 7 7 7 b f f . . . . . 
+        . . . f 7 7 7 7 b f . . . . . . 
         . . . . f f f f f . . . . . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -702,11 +702,11 @@ function animateRun () {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c c a a c b f . . . . 
+        . . f c c c c 7 7 c b f . . . . 
         . . f c c c c d d c b f . . . . 
         . . f b f f d d d f f f f . . . 
-        . . f a a a a a a a a b f f . . 
-        . . . f a a b f f a a a f f . . 
+        . . f 7 7 7 7 7 7 7 7 b f f . . 
+        . . . f 7 7 b f f 7 7 7 f f . . 
         . . . . f f f . f f f f f . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -719,12 +719,12 @@ function animateRun () {
         . f d d f d d d e e e f . . . . 
         . f d d f d d d d d d f . . . . 
         . f d d d d d d d d d f . . . . 
-        . . f c c c a a c c b f . . . . 
+        . . f c c c 7 7 c c b f . . . . 
         . . f c c d d d c c b f . . . . 
         . . f b f f d d f f f f . . . . 
-        . . f a a a a a a a b f . . . . 
-        . . . f a a a a b f f . . . . . 
-        . . . f a a a a b f . . . . . . 
+        . . f 7 7 7 7 7 7 7 b f . . . . 
+        . . . f 7 7 7 7 b f f . . . . . 
+        . . . f 7 7 7 7 b f . . . . . . 
         . . . . f f f f f . . . . . . . 
         `)
     mainRunLeft.addAnimationFrame(img`
@@ -741,8 +741,8 @@ function animateRun () {
         . . f c a a c c c c b f . . . . 
         . f d d d b c c c c b f . . . . 
         f f f d d f f f f f f f . . . . 
-        f f f a a a a a a a b f . . . . 
-        . f a a b f a a b f f . . . . . 
+        f f f 7 7 7 7 7 7 7 b f . . . . 
+        . f 7 7 b f 7 7 b f f . . . . . 
         . f f f f . f f f . . . . . . . 
         `)
     mainRunRight = animation.createAnimation(ActionKind.Walking, 100)
@@ -757,12 +757,12 @@ function animateRun () {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c a a c c c f . . 
+        . . . . f b c c 7 7 c c c f . . 
         . . . . f b c c d d d c c f . . 
         . . . . f f f f d d f f b f . . 
-        . . . . f b a a a a a a a f . . 
-        . . . . . f f b a a a a f . . . 
-        . . . . . . f b a a a a f . . . 
+        . . . . f b 7 7 7 7 7 7 7 f . . 
+        . . . . . f f b 7 7 7 7 f . . . 
+        . . . . . . f b 7 7 7 7 f . . . 
         . . . . . . . f f f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -776,11 +776,11 @@ function animateRun () {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c a a c c c c f . . 
+        . . . . f b c 7 7 c c c c f . . 
         . . . . f b c d d c c c c f . . 
         . . . f f f f d d d f f b f . . 
-        . . f f b a a a a a a a a f . . 
-        . . f f a a a f f b a a f . . . 
+        . . f f b 7 7 7 7 7 7 7 7 f . . 
+        . . f f 7 7 7 f f b 7 7 f . . . 
         . . . f f f f . . f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -793,12 +793,12 @@ function animateRun () {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c a a c c c f . . 
+        . . . . f b c c 7 7 c c c f . . 
         . . . . f b c c d d d c c f . . 
         . . . . f f f f d d f f b f . . 
-        . . . . f b a a a a a a a f . . 
-        . . . . . f f b a a a a f . . . 
-        . . . . . . f b a a a a f . . . 
+        . . . . f b 7 7 7 7 7 7 a f . . 
+        . . . . . f f b 7 7 7 7 f . . . 
+        . . . . . . f b 7 7 7 7 f . . . 
         . . . . . . . f f f f f . . . . 
         `)
     mainRunRight.addAnimationFrame(img`
@@ -812,11 +812,11 @@ function animateRun () {
         . . . . f e e e d d d f d d f . 
         . . . . f d d d d d d f d d f . 
         . . . . f d d d d d d d d d f . 
-        . . . . f b c c c c a a c f . . 
+        . . . . f b c c c c 7 7 c f . . 
         . . . . f b c c c c b d d d f . 
         . . . . f f f f f f f d d f f f 
-        . . . . f b a a a a a a a f f f 
-        . . . . . f f b a a f b a a f . 
+        . . . . f b 7 7 7 7 7 7 7 f f f 
+        . . . . . f f b 7 7 f b 7 7 f . 
         . . . . . . . f f f . f f f . . 
         `)
 }
@@ -846,12 +846,12 @@ function animateJumps () {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainJumpLeft.addAnimationFrame(img`
@@ -864,11 +864,11 @@ function animateJumps () {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d d c c c c c c d d d f . . 
         . f d f f f b b f f f d d f . . 
-        . . f a a a a a a a a a b f . . 
-        . . . f a a b f f a a b f . . . 
+        . . f 7 7 7 7 7 7 7 7 7 b f . . 
+        . . . f 7 7 b f f 7 7 b f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
         `)
@@ -883,11 +883,11 @@ function animateJumps () {
             . f d d f d d d d f d d d e f . 
             . f d d f d d d d f d d d f . . 
             . f d d d d d d d d d d d f f . 
-            . d a b c c c c c c c c b a d . 
-            . d a c c c c c c c c c c a d . 
+            . d 7 b c c c c c c c c b 7 d . 
+            . d 7 c c c c c c c c c c 7 d . 
             . f f f f f b b f f f f f f f . 
-            . . f a a a a a a a a a b f . . 
-            . . . f a a b f f a a b f . . . 
+            . . f 7 7 7 7 7 7 7 7 7 b f . . 
+            . . . f 7 7 b f f 7 7 b f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
             `)
@@ -904,12 +904,12 @@ function animateJumps () {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         `)
     mainJumpRight.addAnimationFrame(img`
@@ -922,11 +922,11 @@ function animateJumps () {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . . f d d d c c c c c c d d f . 
         . . f d d f f f b b f f f d f . 
-        . . f b a a a a a a a a a f . . 
-        . . . f b a a f f b a a f . . . 
+        . . f b 7 7 7 7 7 7 7 7 7 f . . 
+        . . . f b 7 7 f f b 7 7 f . . . 
         . . . . f f f . . f f f . . . . 
         . . . . . . . . . . . . . . . . 
         `)
@@ -941,11 +941,11 @@ function animateJumps () {
             . f e d d d f d d d d f d d f . 
             . . f d d d f d d d d f d d f . 
             . f f d d d d d d d d d d d f . 
-            . d a b c c c c c c c c b a d . 
-            . d a c c c c c c c c c c a d . 
+            . d 7 b c c c c c c c c b 7 d . 
+            . d 7 c c c c c c c c c c 7 d . 
             . f f f f f f f b b f f f f f . 
-            . . f b a a a a a a a a a f . . 
-            . . . f b a a f f b a a f . . . 
+            . . f b 7 7 7 7 7 7 7 7 7 f . . 
+            . . . f b 7 7 f f b 7 7 f . . . 
             . . . . f f f . . f f f . . . . 
             . . . . . . . . . . . . . . . . 
             `)
@@ -977,10 +977,10 @@ function animateCrouch () {
         . f d d f d d d d f d d d e f . 
         . f d d f d d d d f d d d f . . 
         . f d d d d d d d d d d d f . . 
-        . f a c c c c c c c c a b f . . 
+        . f 7 c c c c c c c c 7 b f . . 
         . f d c c c c c c c c c d d f . 
         f d d f f f b b f f f f d d f . 
-        . f f a a a a a a a a a b f . . 
+        . f f 7 7 7 7 7 7 7 7 7 b f . . 
         . . . f f f f . f f f f f . . . 
         `)
     mainCrouchRight = animation.createAnimation(ActionKind.Idle, 100)
@@ -997,10 +997,10 @@ function animateCrouch () {
         . f e d d d f d d d d f d d f . 
         . . f d d d f d d d d f d d f . 
         . . f d d d d d d d d d d d f . 
-        . . f b a c c c c c c c c a f . 
+        . . f b 7 c c c c c c c c 7 f . 
         . f d d c c c c c c c c c d f . 
         . f d d f f f f b b f f f d d f 
-        . . f b a a a a a a a a a f f . 
+        . . f b 7 7 7 7 7 7 7 7 7 f f . 
         . . . f f f f f . f f f f . . . 
         `)
 }
@@ -1361,10 +1361,4 @@ game.onUpdate(function () {
     } else {
         animation.setAction(hero, ActionKind.Idle)
     }
-})
-forever(function () {
-    if (!(gameIsOn)) {
-        return;
-    }
-    music.play(music.createSong(hex`0078000408020400001c00010a006400f40164000004000000000000000000000000000500000450000400080002252a0c0010000129140018000319242718001c0001271c0020000122200024000125240028000222292c003000011d30003400031b202534003800012938003c0001253c00400003121b2a03001c0001dc00690000045e010004000000000000000000000564000104000330000400080001200c001000012510001400010d1c002000011924002800011b28002c00010d3400380001143c004000011905001c000f0a006400f4010a00000400000000000000000000000000000000022f001000140002161818001c0002141e1c002000030f1d2920002400012924002800010628002c0001123c00400002222506001c00010a006400f401640000040000000000000000000000000000000002120018001c00010c2c003000010f34003800010a`), music.PlaybackMode.UntilDone)
 })
