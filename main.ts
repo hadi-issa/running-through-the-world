@@ -75,7 +75,7 @@ function giveIntroduction() {
     showInstruction("Move with the left and right buttons.")
     showInstruction("Jump with the up or A button.")
     showInstruction("Double jump by pressing space midair.")
-    showInstruction("Refresh game and press play to start.")
+    showInstruction("Press A to start the game.")
     helpOn=false
 }
 function initializeCoinAnimation() {
@@ -653,9 +653,11 @@ sprites.onOverlap(SpriteKind.Cursor, SpriteKind.Button, function (sprite, otherS
         level = 1
         levelControl()
     }
-    if (otherSprite == Help && controller.A.isPressed()) {
-        level = 5
-        levelControl()
+    
+    if (otherSprite == Help){
+        helpIsOverlap=true
+    }else{
+        helpIsOverlap = false
     }
 })
 function animateRun() {
@@ -1382,6 +1384,10 @@ function createEnemies() {
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (helpIsOverlap) {
+        level = 5
+        levelControl()
+    }
     if (helpOn) return
     if(gameIsOn){
         attemptJump()
@@ -1488,6 +1494,7 @@ let mainIdleLeft: animation.Animation = null
 let doubleJumpSpeed = 0
 let canDoubleJump = false
 let hero: Sprite = null
+let helpIsOverlap=false
 let gameIsOn = false
 let helpOn = false
 let coinAnimation: animation.Animation = null
